@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "681862166341",
+    "project_id": "previsaotempo-a3c69",
+    "storage_bucket": "previsaotempo-a3c69.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681862166341:android:b018818f4a8c4f17d9702c",
+        "android_client_info": {
+          "package_name": "com.previsao_tempo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "681862166341-h4ic2vbo4ngrpkmkt5vac8l8pepmaa1n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgz4QuODnYNb_jV-EVE-vSRwnl_Jp7xeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "681862166341-h4ic2vbo4ngrpkmkt5vac8l8pepmaa1n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
