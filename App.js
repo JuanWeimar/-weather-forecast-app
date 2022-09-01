@@ -8,6 +8,8 @@ import {StatusBar} from 'react-native';
 import {COLORS} from './src/assets/colors';
 import ForgotPassword from './src/screens/ForgotPassword';
 import Preload from './src/screens/Preload';
+import ListPrev from './src/screens/ListPrev';
+import EditPrev from './src/screens/EditPrev';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +31,16 @@ const App = () => {
           component={Preload}
           options={SignUpStyle}
         />
+        <Stack.Screen
+          name="ListPrev"
+          component={ListPrev}
+          options={ListPrevStyle}
+        />
+        <Stack.Screen
+          name="EditPrev"
+          component={EditPrev}
+          options={EditPrevStyle}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -48,6 +60,18 @@ const ForgotPasswordStyle = {
 };
 const SignUpStyle = {
   title: 'Cadastre-se',
+  headerStyle: {backgroundColor: COLORS.primary},
+  headerTitleStyle: {color: COLORS.white},
+  headerTintColor: COLORS.white,
+};
+const ListPrevStyle = {
+  title: 'Listagem',
+  headerStyle: {backgroundColor: COLORS.primary},
+  headerTitleStyle: {color: COLORS.white},
+  headerTintColor: COLORS.white,
+};
+const EditPrevStyle = {
+  title: 'Atualização',
   headerStyle: {backgroundColor: COLORS.primary},
   headerTitleStyle: {color: COLORS.white},
   headerTintColor: COLORS.white,
