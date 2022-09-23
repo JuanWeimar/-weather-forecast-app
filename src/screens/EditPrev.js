@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {View, TextInput, SafeAreaView, StyleSheet, ToastAndroid, Alert} from 'react-native';
 import { COLORS } from '../assets/colors';
 import MeuButton from '../components/MeuButton';
 import ButtonDelete from '../components/ButtonDelete';
 import Loading from '../components/Loading';
-import getCurrentWeather from '../api/consultApi';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
+//import getCurrentWeather from '../api/consultApi';
+import {WheaterContext} from '../context/WheaterProvider';
+
 
 const EditPrev = ({route, navigation}) => {
     //console.log(route.params.prev);
@@ -21,6 +21,8 @@ const EditPrev = ({route, navigation}) => {
   const [id, setId] = useState('');
   const [dataWeather, setWeather] = useState([]);
   const [loading, setLoading] = useState(false);
+  const {extinguish, update, getCurrentWeather} = useContext(WheaterContext);
+
 
 
   useEffect(() => {
@@ -51,26 +53,10 @@ const EditPrev = ({route, navigation}) => {
   const atualizar = async () => {
     try {
         let data = await consulta();
-        let userF = auth().currentUser;
-        //console.log('console do atualizar' + '=>' + dataWeather);
         console.log('em cima do dataWeather');
         console.log(data.cidade);
-        firestore()
-            .collection('wheater')
-            .doc(userF.uid)
-            .collection('cities')
-            .doc(id)
-            .set(data)
-            .then(() => {
-                //setWeather('');
-                setCityName(route.params.prev.nome);
-                console.log('Previsao updated!');
-                showToast('Previsão Atualizada. ');
-                navigation.goBack();
-            })
-            .catch((e) => {
-                console.log('Previsao: erro em atualizar' + e);
-            });
+        update(id, data);
+        navigation.goBack();
         } catch (error) {
             console.log(error);
         }
@@ -86,22 +72,8 @@ const EditPrev = ({route, navigation}) => {
       {
         text: 'Sim',
         onPress: async () => {
-          let userF = auth().currentUser;
           setLoading(true);
-          firestore()
-            .collection('wheater')
-            .doc(userF.uid)
-            .collection('cities')
-            .doc(id)
-            .delete()
-            .then(() => {
-                console.log('Previsao Deletada!');
-                showToast('Previsão Deletada. ');
-                navigation.goBack();
-            })
-            .catch((e) => {
-                console.log('Previsao: erro em deletar' + e);
-            });
+          extinguish(id);
           setLoading(false);
           navigation.goBack();
         },

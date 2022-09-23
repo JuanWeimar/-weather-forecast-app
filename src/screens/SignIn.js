@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {View, StyleSheet, Text, Image, TextInput, ScrollView, Alert} from 'react-native';
 import MeuButton from '../components/MeuButton';
 import {COLORS} from '../assets/colors';
@@ -9,26 +9,28 @@ import auth from '@react-native-firebase/auth';
 import Loading from '../components/Loading';
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import {AuthUserContext} from '../context/AuthUserProvider';
 
 
 const SignIn = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [loading, setLoading] = useState('');
+  const {signIn, user} = useContext(AuthUserContext);
 
 
   const recuperarSenha = () => {
         navigation.navigate('ForgotPassword');
   };
 
-  async function storeUserSession(value) {
-    try {
-        console.log(value);
-      await EncryptedStorage.setItem('user_session', JSON.stringify(value));
-    } catch (error) {
-      console.error('SignIn, storeUserSession: ' + error);
-    }
-  }
+//   async function storeUserSession(value) {
+//     try {
+//         console.log(value);
+//       await EncryptedStorage.setItem('user_session', JSON.stringify(value));
+//     } catch (error) {
+//       console.error('SignIn, storeUserSession: ' + error);
+//     }
+//   }
 
 //   async function retrieveUserSession() {
 //     try {
@@ -44,41 +46,15 @@ const SignIn = ({navigation}) => {
   const entrar = async () => {
     if (email !== '' && pass !== '') {
         setLoading(true);
-        auth()
-        .signInWithEmailAndPassword(email, pass)
-        .then(async () => {
-            if (!auth().currentUser.emailVerified) {
-                Alert.alert('Erro', 'Você deve verificar o seu email para prosseguir.');
-                return;
-            }
-            await storeUserSession({
-                email,
-                pass,
-              });
+        await signIn(email, pass);
+        if (user) {
             navigation.dispatch(
-                CommonActions.reset({
-                    index: 0,
-                    routes: [{name: 'Home'}],
-                }),
-            );
-        })
-        .catch((e) => {
-            console.log('SignIn: erro em entrar: ' + e);
-            switch (e.code) {
-                case 'auth/user-not-found':
-                    Alert.alert('Erro', 'Usuário não encontrado');
-                    break;
-                case 'auth/wrong-password':
-                    Alert.alert('Erro', 'Erro na senha');
-                    break;
-                case 'auth/invalid-email':
-                    Alert.alert('Erro', 'Email inválido');
-                    break;
-                case 'auth/user-disabled':
-                    Alert.alert('Erro', 'Usuário desabilitado');
-                    break;
-            }
-        });
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{name: 'AppStack'}],
+                    }),
+                );
+        }
         setLoading(false);
     } else {
         Alert.alert('Erro', 'Por favor, digite email e senha');

@@ -13,7 +13,7 @@ export const LoadingArea = styled.View`
   bottom: 0;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* background-color: rgba(0, 0, 0, 0.5); */
 `;
 
 export default () => {

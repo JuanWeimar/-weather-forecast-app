@@ -1,57 +1,62 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect} from 'react';
+import React, {useEffect, useContext} from 'react';
 import {Container, Image} from './styles';
-import EncryptedStorage from 'react-native-encrypted-storage';
-import auth from '@react-native-firebase/auth';
+import {AuthUserContext} from '../../context/AuthUserProvider';
+import {WheaterContext} from '../../context/WheaterProvider';
+import {AdvContext} from '../../context/AdvProvider';
+import {ApiContext} from '../../context/ApiProvider';
+import {CommonActions} from '@react-navigation/native';
 
 const Preload = ({navigation}) => {
+  const { getUserCache, signIn} = useContext(AuthUserContext);
+  const {getPrev} = useContext(WheaterContext);
+  const {getAdv} = useContext(AdvContext);
+  const {getApi} = useContext(ApiContext);
+
   useEffect(() => {
-    buscarDadosNaCache();
+    //buscarDadosNaCache();
+    entrar();
+    getPrev();
+    //getAdv();
+    getApi();
   }, []);
 
-  async function retrieveUserSession() {
-    try {
-      const session = await EncryptedStorage.getItem('user_session');
-      if (session !== undefined) {
-        return JSON.parse(session);
-      }
-    } catch (error) {
-      console.error('SignIn, storeUserSession: ' + error);
-    }
-  }
-
   const entrar = async (email, password) => {
-    if (email !== '' && password !== '') {
-      auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
-          navigation.navigate('Home');
-        })
-        .catch(error => {
-          if (error.code === 'auth/email-already-in-use') {
-            console.log('That email address is already in use!');
-          }
-
-          if (error.code === 'auth/invalid-email') {
-            console.log('That email address is invalid!');
-          }
-
-          console.error(error);
-        });
-    }
-  };
-
-  const buscarDadosNaCache = async () => {
-    let login = await retrieveUserSession();
-    console.log('Dados da cache');
-    console.log(login);
-    if (login) {
-      entrar(login.email, login.pass);
+      //se está logado
+      const jsonValue = await getUserCache();
+      let localUser = JSON.parse(jsonValue);
+      console.log('Cache' + '=>' + jsonValue);
+    if (jsonValue !== null) {
+      await signIn(localUser.email, localUser.pass);
+      console.log('AppStack');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'AppStack'}],
+        }),
+      );
     } else {
-      navigation.navigate('SignIn');
+      //se está null, refaz o login usando a cache
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'SignIn'}],
+            }),
+          );
     }
   };
+
+  // const buscarDadosNaCache = async () => {
+  //   let login = await retrieveUserSession();
+  //   console.log('Dados da cache');
+  //   console.log(login);
+  //   if (login) {
+  //     entrar(login.email, login.pass);
+  //   } else {
+  //     navigation.navigate('SignIn');
+  //   }
+  // };
 
   return (
     <Container>

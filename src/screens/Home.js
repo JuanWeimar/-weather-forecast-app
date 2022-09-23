@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {View, Text, StyleSheet, Alert, ScrollView, Image} from 'react-native';
 import MeuButton from '../components/MeuButton';
 import ButtonPesquisa from '../components/ButtonPesquisa';
@@ -9,8 +9,11 @@ import auth from '@react-native-firebase/auth';
 import {CommonActions} from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInput } from './SignUp/styles';
-import getCurrentWeather from '../api/consultApi';
+//import getCurrentWeather from '../api/consultApi';
 import firestore from '@react-native-firebase/firestore';
+import {AuthUserContext} from '../context/AuthUserProvider';
+
+import {WheaterContext} from '../context/WheaterProvider';
 
 const Home = ({navigation}) => {
   const [city_name, setCityName] = useState('');
@@ -21,6 +24,9 @@ const Home = ({navigation}) => {
   const [time, setTime] = useState('');
   const [velocity, setVelocity] = useState('');
   const [dataWeather, setWeather] = useState('');
+  const { getUserCache, signOut} = useContext(AuthUserContext);
+
+  const {savePrev, getCurrentWeather} = useContext(WheaterContext);
 
 
   useEffect(() => {
@@ -45,20 +51,26 @@ const Home = ({navigation}) => {
     }
   };
 
-  const guardar = () => {
-    let userF = auth().currentUser;
-    firestore()
-    .collection('wheater')
-    .doc(userF.uid)
-    .collection('cities')
-    .add(dataWeather)
-    .then(() => {
-        console.log('Previsao cadastrada!');
-        navigation.navigate('ListPrev');
-    })
-    .catch((e) => {
-        console.log('Previsao: erro em cadastrar' + e);
-    });
+  const guardar = async () => {
+    // let userF = auth().currentUser;
+    // firestore()
+    // .collection('wheater')
+    // .doc(userF.uid)
+    // .collection('cities')
+    // .add(dataWeather)
+    // .then(() => {
+    //     console.log('Previsao cadastrada!');
+    //     navigation.navigate('ListPrev');
+    // })
+    // .catch((e) => {
+    //     console.log('Previsao: erro em cadastrar' + e);
+    // });
+    savePrev(dataWeather);
+    try {
+      navigation.navigate('ListPrev');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const listar = () => {
@@ -66,16 +78,17 @@ const Home = ({navigation}) => {
   };
 
   const sair = () => {
-    auth()
-    .signOut()
-    .then(() => {
+    // auth()
+    // .signOut()
+    // .then(() => {
+      signOut();
       navigation.dispatch(
         CommonActions.reset({
             index: 0,
-            routes: [{name: 'SignIn'}],
+            routes: [{name: 'AuthStack'}],
         }),
     );
-    });
+    // });
 
   };
 
